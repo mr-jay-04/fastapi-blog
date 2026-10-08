@@ -1,21 +1,24 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import DeclarativeBase
 
-SQLALCHEMY_DATABASE_URL = 'sqlite:///./blog.db'
+SQLALCHEMY_DATABASE_URL = 'sqlite+aiosqlite:///./blog.db'
 
-engine = create_engine(              # creates an SQLAlchemy Engine object
+engine = create_async_engine(              # creates an SQLAlchemy Engine object
     SQLALCHEMY_DATABASE_URL,
     connect_args={"check_same_thread": False},
 )
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine) # creates a factory for creating session
+AsyncSessionLocal = async_sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,) # creates a factory for creating session
 
 class Base(DeclarativeBase):  # Base class for all my SQLALchemy models like User, Post
     pass
 
-def get_db(): # creates a database session and gives it to your API endpoint
-    with SessionLocal() as db:
-        yield db
+async def get_db(): # creates a database session and gives it to your API endpoint
+    async with AsyncSessionLocal() as session:
+        yield session
 
 
 
