@@ -1,5 +1,6 @@
 from datetime import datetime
 from email.mime import base
+from typing import List
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -57,3 +58,10 @@ class PostResponse(PostBase):  #inherits PostBase and also adds data from the sy
     user_id: int
     date_posted: datetime
     author: UserPublic
+
+class PaginatedPostResponse(BaseModel):
+    posts: List[PostResponse]
+    total: int
+    skip: int
+    limit: int
+    has_more: bool
